@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lumina Lead Scraper</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            margin: 0 0 10px 0;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .stat-card h3 {
+            margin: 0 0 10px 0;
+            color: #666;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .btn:hover {
+            background: #5568d3;
+        }
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .status {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .status.running {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+        table {
+            width: 100%;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-collapse: collapse;
+            overflow: hidden;
+        }
+        th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #dee2e6;
+        }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        tr:hover {
+            background: #f8f9fa;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚀 Lumina Lead Scraper</h1>
+        <p>Automated Solana token lead generation and outreach</p>
+    </div>
+
+    <div class="stats">
+        <div class="stat-card">
+            <h3>Total Leads</h3>
+            <div class="value" id="total-leads">{{ stats.total_leads }}</div>
+        </div>
+        <div class="stat-card">
+            <h3>DMs Sent</h3>
+            <div class="value" id="dms-sent">{{ stats.dms_sent }}</div>
+        </div>
+        <div class="stat-card">
+            <h3>DMs Failed</h3>
+            <div class="value" id="dms-failed">{{ stats.dms_failed }}</div>
+        </div>
+        <div class="stat-card">
+            <h3>No Admins</h3>
+            <div class="value" id="no-admins">{{ stats.no_admins }}</div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn" id="scrape-btn" onclick="startScrape()">
+            🔍 Start Scraping
+        </button>
+        <div class="status" id="status">
+            {{ status.message }}
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Token</th>
+                <th>Symbol</th>
+                <th>Market Cap</th>
+                <th>Telegram</th>
+                <th>Admin</th>
+                <th>Status</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody id="leads-table">
+            {% for lead in leads %}
+            <tr>
+                <td><strong>{{ lead.name }}</strong></td>
+                <td>{{ lead.symbol }}</td>
+                <td>${{ "{:,}".format(lead.mcap|int) }}</td>
+                <td><a href="{{ lead.telegram }}" target="_blank">Link</a></td>
+                <td>{% if lead.admin_username %}@{{ lead.admin_username }}{% else %}-{% endif %}</td>
+                <td>
+                    {% if lead.dm_status == 'dm_sent' %}
+                        <span class="badge badge-success">DM Sent</span>
+                    {% elif lead.dm_status == 'dm_failed' %}
+                        <span class="badge badge-danger">DM Failed</span>
+                    {% elif lead.dm_status == 'no_admins_found' %}
+                        <span class="badge badge-warning">No Admins</span>
+                    {% else %}
+                        <span class="badge">{{ lead.dm_status }}</span>
+                    {% endif %}
+                </td>
+                <td>{{ lead.timestamp[:19] if lead.timestamp else '-' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        function startScrape() {
+            const btn = document.getElementById('scrape-btn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Scraping...';
+            
+            fetch('/api/scrape', { method: 'POST' })
+                .then(r => r.json())
+                .then(data => {
+                    startStatusPolling();
+                })
+                .catch(err => {
+                    alert('Error: ' + err);
+                    btn.disabled = false;
+                    btn.textContent = '🔍 Start Scraping';
+                });
+        }
+
+        function startStatusPolling() {
+            const interval = setInterval(() => {
+                fetch('/api/status')
+                    .then(r => r.json())
+                    .then(status => {
+                        const statusEl = document.getElementById('status');
+                        statusEl.textContent = status.message;
+                        statusEl.className = status.running ? 'status running' : 'status';
+                        
+                        if (!status.running) {
+                            clearInterval(interval);
+                            document.getElementById('scrape-btn').disabled = false;
+                            document.getElementById('scrape-btn').textContent = '🔍 Start Scraping';
+                            setTimeout(() => location.reload(), 2000);
+                        }
+                    });
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

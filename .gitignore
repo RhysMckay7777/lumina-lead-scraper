@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+venv/
+env/
+
+# Environment
+.env
+.env.local
+*.session
+*.session-journal
+
+# Credentials
+*credentials*.json
+token.json
+oauth*.json
+
+# Data
+*.db
+*.sqlite
+*.csv
+leads/
+exports/
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp

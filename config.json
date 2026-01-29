@@ -1,0 +1,12 @@
+{
+  "min_mcap": 100000,
+  "max_mcap": 1200000,
+  "min_liquidity": 1000,
+  "max_age_days": 7,
+  "chain": "solana",
+  "telegram_api_id": "33859061",
+  "telegram_api_hash": "e82facfac85ca6b0e89a9368fadf0103",
+  "telegram_phone": "+971588241651",
+  "delay_between_joins": 30,
+  "max_joins_per_session": 30
+}
