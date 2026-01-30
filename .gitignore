@@ -8,9 +8,19 @@ __pycache__/
 venv/
 env/
 
+# Node.js / Next.js
+node_modules/
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+.vercel
+
 # Environment
 .env
 .env.local
+.env*.local
 *.session
 *.session-journal
 
