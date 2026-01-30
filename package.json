@@ -1,0 +1,10 @@
+{
+  "name": "lumina-lead-scraper-root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "cd web-ui && npm run dev",
+    "build": "cd web-ui && npm install && npm run build",
+    "start": "cd web-ui && npm start"
+  }
+}
