@@ -1,0 +1,9 @@
+scraper/
+*.md
+.git
+.env*
+*.log
+*.csv
+*.session
+venv/
+__pycache__/
