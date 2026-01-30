@@ -1,4 +1,3 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "web-ui/.next"
+  "framework": "nextjs"
 }
