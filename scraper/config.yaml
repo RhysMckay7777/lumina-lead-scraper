@@ -103,8 +103,8 @@ monitoring:
     timezone: "UTC"
   
   # Cooldown after actions
-  cooldown_after_dm_minutes: 15
-  cooldown_after_join_minutes: 5
+  cooldown_after_dm_minutes: 2
+  cooldown_after_join_minutes: 1
   
   # Error handling
   max_errors_before_pause: 5

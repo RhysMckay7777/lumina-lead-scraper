@@ -23,7 +23,7 @@ import traceback
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from database import LeadDatabase
-from dex_scraper import DEXScreenerScraper
+from dex_api_scraper import DEXScreenerAPI  # Use API instead of web scraper
 from google_index_checker import GoogleIndexChecker
 from telegram_automator import TelegramAutomator
 
@@ -98,7 +98,7 @@ class AutonomousScraper:
             delay_seconds=self.config.get('google_index', {}).get('check_delay_seconds', 5)
         )
         
-        self.dex_scraper = DEXScreenerScraper(headless=True)
+        self.dex_scraper = DEXScreenerAPI()  # Use API instead of Selenium
         
         # Message template
         self.message_template = self.config.get('telegram', {}).get('message_template', '')
@@ -224,17 +224,31 @@ class AutonomousScraper:
         
         self.logger.info(f"Skipping {len(skip_addresses)} already-known addresses")
         
-        # Scrape new tokens
+        # Scrape new tokens using API
         new_tokens = []
+        
+        # Determine chain from URLs
+        chains = set()
         for url in urls:
-            self.logger.info(f"\n📡 Scraping: {url}")
+            if 'solana' in url:
+                chains.add('solana')
+            elif 'ethereum' in url:
+                chains.add('ethereum')
+            elif 'base' in url:
+                chains.add('base')
+        
+        if not chains:
+            chains = {'solana'}  # Default to Solana
+        
+        for chain in chains:
+            self.logger.info(f"\n📡 Scraping {chain} via API...")
             
-            tokens = self.dex_scraper.scrape_url(
-                url=url,
-                pages=scraping_config.get('pages_to_scrape', 3),
-                max_tokens=scraping_config.get('max_tokens_per_session', 100),
-                filters=filters,
-                skip_addresses=skip_addresses
+            tokens = self.dex_scraper.scrape_with_filters(
+                chain=chain,
+                min_volume=filters.get('min_volume_24h', 10000),
+                min_liquidity=filters.get('min_liquidity', 5000),
+                max_age_hours=filters.get('max_age_hours', 168),
+                limit=scraping_config.get('max_tokens_per_session', 100)
             )
             
             for token in tokens:
