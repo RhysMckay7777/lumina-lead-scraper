@@ -1,0 +1,143 @@
+# Lumina Lead Scraper Configuration
+# All settings for the autonomous scraper system
+
+# =============================================================================
+# DEXScreener Configuration
+# =============================================================================
+dexscreener:
+  # URLs to monitor continuously
+  urls_to_monitor:
+    - "https://dexscreener.com/solana?rankBy=trendingScoreH6&order=desc"
+    - "https://dexscreener.com/solana/new-pairs"
+    - "https://dexscreener.com/ethereum?rankBy=trendingScoreH6&order=desc"
+  
+  # Default filters (can be overridden per URL)
+  filters:
+    min_volume_24h: 10000      # $10k minimum volume
+    max_volume_24h: null       # No max
+    min_liquidity: 5000        # $5k minimum liquidity
+    max_liquidity: null        # No max
+    min_age_hours: 1           # At least 1 hour old
+    max_age_hours: 168         # Max 7 days old (168 hours)
+    chains:                    # Chains to include
+      - solana
+      - ethereum
+      - base
+      - arbitrum
+  
+  # Scraping settings
+  scraping:
+    pages_to_scrape: 3         # Scrape first 3 pages
+    tokens_per_page: 50        # Approximate tokens per page
+    max_tokens_per_session: 100
+    scroll_pause_seconds: 2
+    page_load_timeout: 30
+
+# =============================================================================
+# Google Index Check Configuration
+# =============================================================================
+google_index:
+  enabled: true
+  only_target_unindexed: true  # Only message projects with unindexed sites
+  check_delay_seconds: 5       # Delay between Google checks (avoid rate limits)
+  user_agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+
+# =============================================================================
+# Telegram Automation Configuration
+# =============================================================================
+telegram:
+  # Credentials (can also use .env file)
+  credentials:
+    api_id: 33859061
+    api_hash: "e82facfac85ca6b0e89a9368fadf0103"
+    phone: "+971588241651"
+    session_file: "lumina_session.session"
+  
+  # Rate limiting
+  rate_limits:
+    join_delay_seconds: 30     # Between joining groups
+    dm_delay_seconds: 60       # Between sending DMs
+    max_joins_per_hour: 10     # Telegram limits
+    max_dms_per_hour: 5        # Conservative to avoid bans
+    max_joins_per_day: 50
+    max_dms_per_day: 30
+  
+  # Outreach message template
+  # Available placeholders: {project_name}, {token_symbol}, {admin_name}
+  message_template: |
+    Hey{admin_name_greeting}! 👋
+    
+    Saw you're building {project_name} - congrats on the launch!
+    
+    We're Lumina, a crypto marketing agency that's helped projects like Stake.com and Polkadot scale their user acquisition.
+    
+    Your site doesn't seem to be indexed on Google yet - we can help fix that and drive organic traffic.
+    
+    Open to a quick chat about growth? No pressure either way.
+  
+  # Alternative templates for A/B testing
+  message_templates_alt:
+    - |
+      Hi! Quick question about {project_name} - are you looking for marketing support?
+      
+      We specialize in crypto SEO and have helped projects get indexed and ranking on Google within weeks.
+      
+      Happy to share some case studies if interested!
+    
+    - |
+      Hey! Love what you're building with {token_symbol}.
+      
+      Noticed your website isn't showing up on Google yet - that's a huge opportunity we can help with.
+      
+      Our agency Lumina specializes in exactly this. 5 min call?
+
+# =============================================================================
+# Autonomous Monitoring Configuration
+# =============================================================================
+monitoring:
+  enabled: true
+  check_interval_minutes: 30   # How often to check for new tokens
+  active_hours:
+    start: 8                   # Start time (hour, 24h format)
+    end: 23                    # End time
+    timezone: "UTC"
+  
+  # Cooldown after actions
+  cooldown_after_dm_minutes: 15
+  cooldown_after_join_minutes: 5
+  
+  # Error handling
+  max_errors_before_pause: 5
+  error_pause_minutes: 60
+
+# =============================================================================
+# Logging & Tracking Configuration
+# =============================================================================
+logging:
+  directory: "~/clawd/scraper-logs"
+  log_level: "INFO"
+  max_log_files: 30            # Keep 30 days of logs
+  log_format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+# =============================================================================
+# Database Configuration
+# =============================================================================
+database:
+  path: "~/lumina-lead-scraper-v2/scraper/leads.db"
+  backup_enabled: true
+  backup_interval_hours: 24
+  backup_directory: "~/lumina-lead-scraper-v2/scraper/backups"
+
+# =============================================================================
+# Daily Report Configuration
+# =============================================================================
+reports:
+  daily_summary_enabled: true
+  send_time: "09:00"           # When to send daily summary (local time)
+  telegram_chat_id: null       # Set to your Telegram user ID to receive reports
+  include_stats:
+    - tokens_found
+    - tokens_contacted
+    - dm_success_rate
+    - unindexed_sites_found
+    - groups_joined
